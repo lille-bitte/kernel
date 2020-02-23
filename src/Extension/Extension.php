@@ -38,4 +38,40 @@ abstract class Extension implements ExtensionInterface
 	public function terminate()
 	{
 	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function setExtensionName($name)
+	{
+		$this->name = $name;
+	}
+
+	/**
+	 * {@inheritdoc}
+	 */
+	public function getExtensionName()
+	{
+		if (null === $this->name) {
+			$this->parseClassName();
+		}
+
+		return $this->name;
+	}
+
+	/**
+	 * Automatically set class name from child class.
+	 *
+	 * @return void
+	 */
+	private function parseClassName()
+	{
+		$pos = strrpos(static::class, "\\");
+
+		$this->setExtensionName(
+			false === $pos
+				? static::class
+				: substr(static::class, $pos + 1)
+		);
+	}
 }
