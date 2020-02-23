@@ -144,6 +144,32 @@ abstract class Kernel implements KernelInterface
 	}
 
 	/**
+	 * Initialize registered extensions.
+	 *
+	 * @return void
+	 * @throws LogicException if two or more extension share a common name.
+	 */
+	protected function initializeExtensions()
+	{
+		$this->extensions = [];
+
+		foreach ($this->registerExtensions() as $ext) {
+			$name = $ext->getName();
+
+			if (isset($this->extensions[$name])) {
+				throw new LogicException(
+					sprintf(
+						"Extension with name (%s) exists.",
+						$name
+					)
+				);
+			}
+
+			$this->extensions[$name] = $ext;
+		}
+	}
+
+	/**
 	 * Get root directory.
 	 *
 	 * @return string
