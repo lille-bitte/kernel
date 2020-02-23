@@ -83,4 +83,72 @@ abstract class Kernel implements KernelInterface
 
 		$emitter->emit($resp->getResponse());
 	}
+
+	/**
+	 * Populate route from controller annotation.
+	 *
+	 * @param string $namespace Controller namespace.
+	 * @param string $controllerDir Controller directory.
+	 * @return void
+	 */
+	protected function populateRouteFromControllerAnnotation($namespace, $controllerDir)
+	{
+		$controllers = glob(
+			sprintf(
+				"%s/%s/*.php",
+				rtrim($this->getRootDirectory(), "/"),
+				rtrim($controllerDir, "/")
+			)
+		);
+		$reader = new AnnotationReader();
+		$router = $this->getContainer()->get('extension.framework.router_factory');
+
+		// restore route group before
+		// get route metadata from
+		// annotation.
+		$router->resetGroup();
+
+		foreach ($controllers as $controller) {
+			$name    = basename($controller, ".php");
+			$fqcn    = $namespace . $name;
+			$methods = get_class_methods($fqcn);
+
+			foreach ($methods as $method) {
+				$refl  = (new ReflectionClass($fqcn))->getMethod($method);
+				$route = $reader->getMethodAnnotation($refl, Route::class);
+
+				if (null === $route) {
+					continue;
+				}
+
+				$methodObj = $reader->getMethodAnnotation($refl, Method::class);
+				$router->any(
+					is_null($methodObj) ? ['GET'] : $methodObj->getMethods(),
+					$route->getRoute(),
+					[$fqcn, $method]
+				);
+			}
+		}
+	}
+
+	/**
+	 * Get root directory.
+	 *
+	 * @return string
+	 */
+	abstract public function getRootDirectory();
+
+	/**
+	 * Configure router object.
+	 *
+	 * @return void
+	 */
+	abstract protected function configureRoute();
+
+	/**
+	 * Populate route from configuration file.
+	 *
+	 * @return void
+	 */
+	abstract protected function populateRouteFromConfig();
 }
