@@ -1,0 +1,25 @@
+{
+	"name": "lille-bitte/kernel",
+	"description": "Micro-framework kernel module.",
+	"type": "library",
+	"license": "BSD-3-Clause",
+	"authors": [
+		{
+			"name": "Paulus Gandung Prakosa",
+			"email": "rvn.plvhx@gmail.com"
+		}
+	],
+	"autoload": {
+		"psr-4": {
+			"LilleBitte\\Kernel\\": "src/"
+		}
+	},
+	"autoload-dev": {
+		"psr-4": {
+			"LilleBitte\\Kernel\\Tests\\": "tests/"
+		}
+	},
+	"require": {
+		"psr/http-message": "^1.0"
+	}
+}
