@@ -8,4 +8,5 @@ declare(strict_types=1);
 interface KernelInterface
 {
 	public function registerExtensions(): iterable;
+	public function registerAnnotationClasses(array $classes);
 }
