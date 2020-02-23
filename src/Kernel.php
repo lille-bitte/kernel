@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace LilleBitte\Kernel;
 
+use LogicException;
 use ReflectionClass;
 use LilleBitte\Annotations\ClassRegistry;
 use LilleBitte\Annotations\AnnotationReader;
