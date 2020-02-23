@@ -18,7 +18,7 @@ use function glob;
 /**
  * @author Paulus Gandung Prakosa <rvn.plvhx@gmail.com>
  */
-abstract class Kernel
+abstract class Kernel implements KernelInterface
 {
 	/**
 	 * @var ContainerBuilder
