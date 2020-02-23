@@ -107,6 +107,14 @@ abstract class Kernel implements KernelInterface
 	}
 
 	/**
+	 * {@inheritdoc}
+	 */
+	public function handle(RequestInterface $request)
+	{
+		$this->request = $request;
+	}
+
+	/**
 	 * Populate route from controller annotation.
 	 *
 	 * @param string $namespace Controller namespace.
