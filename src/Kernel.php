@@ -86,7 +86,7 @@ abstract class Kernel implements KernelInterface
 	{
 		$router  = $this->container->get('extension.framework.router_factory');
 		$emitter = $this->container->get('extension.framework.emitter');
-		$resp    = $router->dispatch($this->getRequest());
+		$resp    = $router->dispatch($this->request);
 
 		if ($resp->getStatus() !== 0) {
 			// TODO: throw an exception.
