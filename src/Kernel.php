@@ -141,7 +141,7 @@ abstract class Kernel implements KernelInterface
 
 		foreach ($controllers as $controller) {
 			$name    = basename($controller, ".php");
-			$fqcn    = $namespace . $name;
+			$fqcn    = $namespace . "\\" . $name;
 			$methods = get_class_methods($fqcn);
 
 			foreach ($methods as $method) {
