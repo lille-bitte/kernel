@@ -53,6 +53,17 @@ abstract class Kernel implements KernelInterface
 	{
 		$this->container = new ContainerBuilder();
 		$this->container->setCacheDir($this->getRootDirectory() . '/var/cache');
+
+		// initialize registered extensions.
+		$this->initializeExtensions();
+
+		// build each registered extensions.
+		foreach ($this->extensions as $ext) {
+			$ext->build($this->container);
+		}
+
+		// compile current container
+		$this->container->compile();
 	}
 
 	/**
