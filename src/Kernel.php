@@ -35,7 +35,7 @@ abstract class Kernel implements KernelInterface
 	/**
 	 * @var array
 	 */
-	private $extensions = [];
+	private $extensions;
 
 	public function __construct(RequestInterface $request)
 	{
