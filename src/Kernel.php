@@ -40,7 +40,7 @@ abstract class Kernel implements KernelInterface
 
 	public function __construct(RequestInterface $request)
 	{
-		$this->setRequest($request);
+		//
 	}
 
 	/**
