@@ -72,8 +72,8 @@ abstract class Kernel implements KernelInterface
 	 */
 	public function send()
 	{
-		$router  = $this->container->get('core.router');
-		$emitter = $this->container->get('core.emitter');
+		$router  = $this->container->get('extension.framework.router_factory');
+		$emitter = $this->container->get('extension.framework.emitter');
 		$resp    = $router->dispatch($this->getRequest());
 
 		if ($resp->getStatus() !== 0) {
