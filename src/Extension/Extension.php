@@ -6,11 +6,18 @@ namespace LilleBitte\Kernel\Extension;
 
 use LilleBitte\Container\ContainerBuilderInterface;
 
+use function strrpos;
+
 /**
  * @author Paulus Gandung Prakosa <rvn.plvhx@gmail.com>
  */
 abstract class Extension implements ExtensionInterface
 {
+	/**
+	 * @var string
+	 */
+	private $name;
+
 	/**
 	 * {@inheritdoc}
 	 */
