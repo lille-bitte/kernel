@@ -97,6 +97,16 @@ abstract class Kernel implements KernelInterface
 	}
 
 	/**
+	 * {@inheritdoc}
+	 */
+	public function registerAnnotationClasses(array $classes)
+	{
+		foreach ($classes as $class) {
+			ClassRegistry::register($class);
+		}
+	}
+
+	/**
 	 * Populate route from controller annotation.
 	 *
 	 * @param string $namespace Controller namespace.
