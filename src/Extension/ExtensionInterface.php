@@ -32,4 +32,19 @@ interface ExtensionInterface
 	 * @return void
 	 */
 	public function terminate();
+
+	/**
+	 * Set extension name.
+	 *
+	 * @param string $name Extension name.
+	 * @return void
+	 */
+	public function setExtensionName($name);
+
+	/**
+	 * Get extension name.
+	 *
+	 * @return string
+	 */
+	public function getExtensionName();
 }
