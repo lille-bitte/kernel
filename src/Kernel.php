@@ -172,7 +172,7 @@ abstract class Kernel implements KernelInterface
 		$this->extensions = [];
 
 		foreach ($this->registerExtensions() as $ext) {
-			$name = $ext->getName();
+			$name = $ext->getExtensionName();
 
 			if (isset($this->extensions[$name])) {
 				throw new LogicException(
