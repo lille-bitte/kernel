@@ -41,6 +41,7 @@ abstract class Kernel implements KernelInterface
 	public function __construct()
 	{
 		$this->buildContainer();
+		$this->configureRoute();
 	}
 
 	/**
