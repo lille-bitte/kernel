@@ -2,6 +2,8 @@
 
 declare(strict_types=1);
 
+namespace LilleBitte\Kernel;
+
 /**
  * @author Paulus Gandung Prakosa <rvn.plvhx@gmail.com>
  */
