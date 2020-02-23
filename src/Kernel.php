@@ -8,6 +8,8 @@ use ReflectionClass;
 use LilleBitte\Annotations\ClassRegistry;
 use LilleBitte\Annotations\AnnotationReader;
 use LilleBitte\Container\ContainerBuilder;
+use LilleBitte\Routing\Annotation\Route;
+use LilleBitte\Routing\Annotation\Method;
 use Psr\Http\Message\RequestInterface;
 
 use function count;
