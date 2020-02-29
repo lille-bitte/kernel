@@ -61,6 +61,7 @@ abstract class Kernel implements KernelInterface
 		// build each registered extensions.
 		foreach ($this->extensions as $ext) {
 			$ext->build($this->container);
+			$this->registerAnnotationClasses($ext->getAnnotationClasses());
 		}
 
 		// compile current container
