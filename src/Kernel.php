@@ -67,11 +67,11 @@ abstract class Kernel implements KernelInterface
 		$this->container->compile();
 	}
 
-	/**
-	 * Get associated dependency injection container.
-	 *
-	 * @return LilleBitte\Container\ContainerBuilderInterface
-	 */
+    /**
+     * Get associated dependency injection container.
+     *
+     * @return ContainerBuilderInterface
+     */
 	public function getContainer()
 	{
 		return $this->container;
