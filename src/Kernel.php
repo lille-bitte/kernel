@@ -115,13 +115,14 @@ abstract class Kernel implements KernelInterface
 		$this->request = $request;
 	}
 
-	/**
-	 * Populate route from controller annotation.
-	 *
-	 * @param string $namespace Controller namespace.
-	 * @param string $controllerDir Controller directory.
-	 * @return void
-	 */
+    /**
+     * Populate route from controller annotation.
+     *
+     * @param string $namespace Controller namespace.
+     * @param string $controllerDir Controller directory.
+     * @return void
+     * @throws \ReflectionException
+     */
 	protected function populateRouteFromControllerAnnotation($namespace, $controllerDir)
 	{
 		$controllers = glob(
