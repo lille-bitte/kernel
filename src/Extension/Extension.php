@@ -59,7 +59,14 @@ abstract class Extension implements ExtensionInterface
 		return $this->name;
 	}
 
-	/**
+    /**
+     * {@inheritdoc}
+     */
+    public function getAnnotationClasses()
+    {
+    }
+
+    /**
 	 * Automatically set class name from child class.
 	 *
 	 * @return void
