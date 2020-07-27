@@ -11,6 +11,7 @@ use LilleBitte\Annotations\AnnotationReader;
 use LilleBitte\Container\ContainerBuilder;
 use LilleBitte\Routing\Annotation\Route;
 use LilleBitte\Routing\Annotation\Method;
+use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 
 use function count;
@@ -23,98 +24,112 @@ use function glob;
  */
 abstract class Kernel implements KernelInterface
 {
-	/**
-	 * @var ContainerBuilder
-	 */
-	private $container;
+    /**
+     * @var ContainerInterface
+     */
+    private $container;
 
-	/**
-	 * @var RequestInterface
-	 */
-	private $request;
+    /**
+     * @var RequestInterface
+     */
+    private $request;
 
-	/**
-	 * @var array
-	 */
-	private $extensions;
+    /**
+     * @var array
+     */
+    private $extensions;
 
-	public function __construct()
-	{
-		$this->buildContainer();
-		$this->configureRoute();
-	}
+    public function __construct()
+    {
+        $this->buildContainer();
+        $this->configureRoute();
+    }
 
-	/**
-	 * Build and configure dependency injection
-	 * container.
-	 *
-	 * @return void
-	 */
-	public function buildContainer()
-	{
-		$this->container = new ContainerBuilder();
-		$this->container->setCacheDir($this->getRootDirectory() . '/var/cache');
+    /**
+     * Build and configure dependency injection
+     * container.
+     *
+     * @return void
+     */
+    public function buildContainer()
+    {
+        $containerBuilder = new ContainerBuilder();
+        $containerBuilder->setCacheDir($this->getRootDirectory() . '/var/cache');
+        $containerBuilder->setCacheFile('container.cache.php');
 
-		// initialize registered extensions.
-		$this->initializeExtensions();
+        // initialize registered extensions.
+        $this->initializeExtensions();
 
-		// build each registered extensions.
-		foreach ($this->extensions as $ext) {
-			$ext->build($this->container);
-			$this->registerAnnotationClasses($ext->getAnnotationClasses());
-		}
+        // build each registered extensions.
+        foreach ($this->extensions as $ext) {
+            $ext->build($containerBuilder);
+            $this->registerAnnotationClasses($ext->getAnnotationClasses());
+        }
 
-		// compile current container
-		$this->container->compile();
-	}
+        // compile current container
+        $containerBuilder->compile();
+
+        // build and set current compiled container
+        $this->setContainer($containerBuilder->build());
+    }
 
     /**
      * Get associated dependency injection container.
      *
      * @return ContainerBuilderInterface
      */
-	public function getContainer()
-	{
-		return $this->container;
-	}
+    public function getContainer()
+    {
+        return $this->container;
+    }
 
-	/**
-	 * Process request and send it's response back
-	 * to the callee.
-	 *
-	 * @return void
-	 */
-	public function send()
-	{
-		$router  = $this->container->get('extension.framework.router_factory');
-		$emitter = $this->container->get('extension.framework.emitter');
-		$resp    = $router->dispatch($this->request);
+    /**
+     * Set dependency injection container.
+     *
+     * @return ContainerInterface
+     */
+    public function setContainer(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
 
-		if ($resp->getStatus() !== 0) {
-			// TODO: throw an exception.
-			return;
-		}
+    /**
+     * Process request and send it's response back
+     * to the callee.
+     *
+     * @return void
+     */
+    public function send()
+    {
+        $router  = $this->getContainer()->get('extension.framework.router_factory');
+        $emitter = $this->getContainer()->get('extension.framework.emitter');
+        $resp    = $router->dispatch($this->request);
 
-		$emitter->emit($resp->getResponse());
-	}
+        if ($resp->getStatus() !== 0) {
+            // TODO: throw an exception.
+            return;
+        }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function registerAnnotationClasses(array $classes)
-	{
-		foreach ($classes as $class) {
-			ClassRegistry::register($class);
-		}
-	}
+        $emitter->emit($resp->getResponse());
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function handle(RequestInterface $request)
-	{
-		$this->request = $request;
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function registerAnnotationClasses(array $classes)
+    {
+        foreach ($classes as $class) {
+            ClassRegistry::register($class);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function handle(RequestInterface $request)
+    {
+        $this->request = $request;
+    }
 
     /**
      * Populate route from controller annotation.
@@ -124,90 +139,90 @@ abstract class Kernel implements KernelInterface
      * @return void
      * @throws \ReflectionException
      */
-	protected function populateRouteFromControllerAnnotation($namespace, $controllerDir)
-	{
-		$controllers = glob(
-			sprintf(
-				"%s/%s/*.php",
-				rtrim($this->getRootDirectory(), "/"),
-				rtrim($controllerDir, "/")
-			)
-		);
-		$reader = new AnnotationReader();
-		$router = $this->getContainer()->get('extension.framework.router_factory');
+    protected function populateRouteFromControllerAnnotation($namespace, $controllerDir)
+    {
+        $controllers = glob(
+            sprintf(
+                "%s/%s/*.php",
+                rtrim($this->getRootDirectory(), "/"),
+                rtrim($controllerDir, "/")
+            )
+        );
+        $reader = new AnnotationReader();
+        $router = $this->getContainer()->get('extension.framework.router_factory');
 
-		// restore route group before
-		// get route metadata from
-		// annotation.
-		$router->resetGroup();
+        // restore route group before
+        // get route metadata from
+        // annotation.
+        $router->resetGroup();
 
-		foreach ($controllers as $controller) {
-			$name    = basename($controller, ".php");
-			$fqcn    = $namespace . "\\" . $name;
-			$methods = get_class_methods($fqcn);
+        foreach ($controllers as $controller) {
+            $name    = basename($controller, ".php");
+            $fqcn    = $namespace . "\\" . $name;
+            $methods = get_class_methods($fqcn);
 
-			foreach ($methods as $method) {
-				$refl  = (new ReflectionClass($fqcn))->getMethod($method);
-				$route = $reader->getMethodAnnotation($refl, Route::class);
+            foreach ($methods as $method) {
+                $refl  = (new ReflectionClass($fqcn))->getMethod($method);
+                $route = $reader->getMethodAnnotation($refl, Route::class);
 
-				if (null === $route) {
-					continue;
-				}
+                if (null === $route) {
+                    continue;
+                }
 
-				$methodObj = $reader->getMethodAnnotation($refl, Method::class);
-				$router->any(
-					is_null($methodObj) ? ['GET'] : $methodObj->getMethods(),
-					$route->getRoute(),
-					[$fqcn, $method]
-				);
-			}
-		}
-	}
+                $methodObj = $reader->getMethodAnnotation($refl, Method::class);
+                $router->any(
+                    is_null($methodObj) ? ['GET'] : $methodObj->getMethods(),
+                    $route->getRoute(),
+                    [$fqcn, $method]
+                );
+            }
+        }
+    }
 
-	/**
-	 * Initialize registered extensions.
-	 *
-	 * @return void
-	 * @throws LogicException if two or more extension share a common name.
-	 */
-	protected function initializeExtensions()
-	{
-		$this->extensions = [];
+    /**
+     * Initialize registered extensions.
+     *
+     * @return void
+     * @throws LogicException if two or more extension share a common name.
+     */
+    protected function initializeExtensions()
+    {
+        $this->extensions = [];
 
-		foreach ($this->registerExtensions() as $ext) {
-			$name = $ext->getExtensionName();
+        foreach ($this->registerExtensions() as $ext) {
+            $name = $ext->getExtensionName();
 
-			if (isset($this->extensions[$name])) {
-				throw new LogicException(
-					sprintf(
-						"Extension with name (%s) exists.",
-						$name
-					)
-				);
-			}
+            if (isset($this->extensions[$name])) {
+                throw new LogicException(
+                    sprintf(
+                        "Extension with name (%s) exists.",
+                        $name
+                    )
+                );
+            }
 
-			$this->extensions[$name] = $ext;
-		}
-	}
+            $this->extensions[$name] = $ext;
+        }
+    }
 
-	/**
-	 * Get root directory.
-	 *
-	 * @return string
-	 */
-	abstract public function getRootDirectory();
+    /**
+     * Get root directory.
+     *
+     * @return string
+     */
+    abstract public function getRootDirectory();
 
-	/**
-	 * Configure router object.
-	 *
-	 * @return void
-	 */
-	abstract protected function configureRoute();
+    /**
+     * Configure router object.
+     *
+     * @return void
+     */
+    abstract protected function configureRoute();
 
-	/**
-	 * Populate route from configuration file.
-	 *
-	 * @return void
-	 */
-	abstract protected function populateRouteFromConfig();
+    /**
+     * Populate route from configuration file.
+     *
+     * @return void
+     */
+    abstract protected function populateRouteFromConfig();
 }
