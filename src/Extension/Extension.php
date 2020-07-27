@@ -13,51 +13,51 @@ use function strrpos;
  */
 abstract class Extension implements ExtensionInterface
 {
-	/**
-	 * @var string
-	 */
-	private $name;
+    /**
+     * @var string
+     */
+    private $name;
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function build(ContainerBuilderInterface $container)
-	{
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function build(ContainerBuilderInterface $container)
+    {
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function boot()
-	{
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function boot()
+    {
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function terminate()
-	{
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function terminate()
+    {
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function setExtensionName($name)
-	{
-		$this->name = $name;
-	}
+    /**
+     * {@inheritdoc}
+     */
+    public function setExtensionName($name)
+    {
+        $this->name = $name;
+    }
 
-	/**
-	 * {@inheritdoc}
-	 */
-	public function getExtensionName()
-	{
-		if (null === $this->name) {
-			$this->parseClassName();
-		}
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtensionName()
+    {
+        if (null === $this->name) {
+            $this->parseClassName();
+        }
 
-		return $this->name;
-	}
+        return $this->name;
+    }
 
     /**
      * {@inheritdoc}
@@ -67,18 +67,18 @@ abstract class Extension implements ExtensionInterface
     }
 
     /**
-	 * Automatically set class name from child class.
-	 *
-	 * @return void
-	 */
-	private function parseClassName()
-	{
-		$pos = strrpos(static::class, "\\");
+     * Automatically set class name from child class.
+     *
+     * @return void
+     */
+    private function parseClassName()
+    {
+        $pos = strrpos(static::class, "\\");
 
-		$this->setExtensionName(
-			false === $pos
-				? static::class
-				: substr(static::class, $pos + 1)
-		);
-	}
+        $this->setExtensionName(
+            false === $pos
+                ? static::class
+                : substr(static::class, $pos + 1)
+        );
+    }
 }
