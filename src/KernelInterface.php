@@ -11,26 +11,26 @@ use Psr\Http\Message\RequestInterface;
  */
 interface KernelInterface
 {
-	/**
-	 * Handle request object.
-	 *
-	 * @param RequestInterface $request Request object.
-	 * @return void
-	 */
-	public function handle(RequestInterface $request);
+    /**
+     * Handle request object.
+     *
+     * @param RequestInterface $request Request object.
+     * @return void
+     */
+    public function handle(RequestInterface $request);
 
-	/**
-	 * Register given extensions.
-	 *
-	 * @return iterable
-	 */
-	public function registerExtensions(): iterable;
+    /**
+     * Register given extensions.
+     *
+     * @return iterable
+     */
+    public function registerExtensions(): iterable;
 
-	/**
-	 * Register given annotation classes.
-	 *
-	 * @param array $classes List of classes.
-	 * @return void
-	 */
-	public function registerAnnotationClasses(array $classes);
+    /**
+     * Register given annotation classes.
+     *
+     * @param array $classes List of classes.
+     * @return void
+     */
+    public function registerAnnotationClasses(array $classes);
 }
