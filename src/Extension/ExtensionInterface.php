@@ -11,47 +11,47 @@ use LilleBitte\Container\ContainerBuilderInterface;
  */
 interface ExtensionInterface
 {
-	/**
-	 * Build current extension.
-	 *
-	 * @param ContainerBuilderInterface $container Container object.
-	 * @return void
-	 */
-	public function build(ContainerBuilderInterface $container);
+    /**
+     * Build current extension.
+     *
+     * @param ContainerBuilderInterface $container Container object.
+     * @return void
+     */
+    public function build(ContainerBuilderInterface $container);
 
-	/**
-	 * Boot up current extension.
-	 *
-	 * @return void
-	 */
-	public function boot();
+    /**
+     * Boot up current extension.
+     *
+     * @return void
+     */
+    public function boot();
 
-	/**
-	 * Terminate down current extension.
-	 *
-	 * @return void
-	 */
-	public function terminate();
+    /**
+     * Terminate down current extension.
+     *
+     * @return void
+     */
+    public function terminate();
 
-	/**
-	 * Set extension name.
-	 *
-	 * @param string $name Extension name.
-	 * @return void
-	 */
-	public function setExtensionName($name);
+    /**
+     * Set extension name.
+     *
+     * @param string $name Extension name.
+     * @return void
+     */
+    public function setExtensionName($name);
 
-	/**
-	 * Get extension name.
-	 *
-	 * @return string
-	 */
-	public function getExtensionName();
+    /**
+     * Get extension name.
+     *
+     * @return string
+     */
+    public function getExtensionName();
 
-	/**
+    /**
      * Get annotation class list.
      *
      * @return array
      */
-	public function getAnnotationClasses();
+    public function getAnnotationClasses();
 }
