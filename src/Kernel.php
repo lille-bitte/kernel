@@ -9,6 +9,7 @@ use ReflectionClass;
 use LilleBitte\Annotations\ClassRegistry;
 use LilleBitte\Annotations\AnnotationReader;
 use LilleBitte\Container\ContainerBuilder;
+use LilleBitte\Kernel\Controller\ControllerInterface;
 use LilleBitte\Routing\Annotation\Route;
 use LilleBitte\Routing\Annotation\Method;
 use Psr\Container\ContainerInterface;
@@ -18,6 +19,7 @@ use function count;
 use function explode;
 use function get_class_methods;
 use function glob;
+use function is_subclass_of;
 
 /**
  * @author Paulus Gandung Prakosa <rvn.plvhx@gmail.com>
@@ -159,21 +161,26 @@ abstract class Kernel implements KernelInterface
         foreach ($controllers as $controller) {
             $name    = basename($controller, ".php");
             $fqcn    = $namespace . "\\" . $name;
-            $methods = get_class_methods($fqcn);
+            $object  = new $fqcn();
+            $methods = get_class_methods($object);
 
             foreach ($methods as $method) {
-                $refl  = (new ReflectionClass($fqcn))->getMethod($method);
+                $refl  = (new ReflectionClass($object))->getMethod($method);
                 $route = $reader->getMethodAnnotation($refl, Route::class);
 
                 if (null === $route) {
                     continue;
                 }
 
+                if (is_subclass_of($object, ControllerInterface::class)) {
+                    $object->setContainer($this->getContainer());
+                }
+
                 $methodObj = $reader->getMethodAnnotation($refl, Method::class);
                 $router->any(
                     is_null($methodObj) ? ['GET'] : $methodObj->getMethods(),
                     $route->getRoute(),
-                    [$fqcn, $method]
+                    [$object, $method]
                 );
             }
         }
