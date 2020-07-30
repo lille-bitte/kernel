@@ -47,11 +47,4 @@ interface ExtensionInterface
      * @return string
      */
     public function getExtensionName();
-
-    /**
-     * Get annotation class list.
-     *
-     * @return array
-     */
-    public function getAnnotationClasses();
 }
