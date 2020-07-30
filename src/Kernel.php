@@ -6,13 +6,16 @@ namespace LilleBitte\Kernel;
 
 use LogicException;
 use ReflectionClass;
-use LilleBitte\Annotations\ClassRegistry;
 use LilleBitte\Annotations\AnnotationReader;
 use LilleBitte\Container\ContainerBuilder;
+use LilleBitte\Container\ContainerInterface;
+use LilleBitte\Emitter\Emitter;
+use LilleBitte\Emitter\EmitterInterface;
 use LilleBitte\Kernel\Controller\ControllerInterface;
+use LilleBitte\Routing\RouterFactory;
+use LilleBitte\Routing\RouterInterface;
 use LilleBitte\Routing\Annotation\Route;
 use LilleBitte\Routing\Annotation\Method;
-use Psr\Container\ContainerInterface;
 use Psr\Http\Message\RequestInterface;
 
 use function count;
@@ -41,8 +44,20 @@ abstract class Kernel implements KernelInterface
      */
     private $extensions;
 
-    public function __construct()
+    /**
+     * @var RouterInterface
+     */
+    private $router;
+
+    /**
+     * @var EmitterInterface
+     */
+    private $emitter;
+
+    public function __construct(RouterInterface $router = null, EmitterInterface $emitter = null)
     {
+        $this->router  = $router ?? RouterFactory::getRouter();
+        $this->emitter = $emitter ?? new Emitter();
         $this->buildContainer();
         $this->configureRoute();
     }
@@ -65,7 +80,6 @@ abstract class Kernel implements KernelInterface
         // build each registered extensions.
         foreach ($this->extensions as $ext) {
             $ext->build($containerBuilder);
-            $this->registerAnnotationClasses($ext->getAnnotationClasses());
         }
 
         // compile current container
@@ -103,8 +117,8 @@ abstract class Kernel implements KernelInterface
      */
     public function send()
     {
-        $router  = $this->getContainer()->get('extension.framework.router_factory');
-        $emitter = $this->getContainer()->get('extension.framework.emitter');
+        $router  = $this->getRouter();
+        $emitter = $this->getEmitter();
         $resp    = $router->dispatch($this->request);
 
         if ($resp->getStatus() !== 0) {
@@ -113,16 +127,6 @@ abstract class Kernel implements KernelInterface
         }
 
         $emitter->emit($resp->getResponse());
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function registerAnnotationClasses(array $classes)
-    {
-        foreach ($classes as $class) {
-            ClassRegistry::register($class);
-        }
     }
 
     /**
@@ -151,7 +155,7 @@ abstract class Kernel implements KernelInterface
             )
         );
         $reader = new AnnotationReader();
-        $router = $this->getContainer()->get('extension.framework.router_factory');
+        $router = $this->getRouter();
 
         // restore route group before
         // get route metadata from
@@ -210,6 +214,26 @@ abstract class Kernel implements KernelInterface
 
             $this->extensions[$name] = $ext;
         }
+    }
+
+    /**
+     * Get router object.
+     *
+     * @return RouterInterface
+     */
+    public function getRouter()
+    {
+        return $this->router;
+    }
+
+    /**
+     * Get emitter object.
+     *
+     * @return EmitterInterface
+     */
+    public function getEmitter()
+    {
+        return $this->emitter;
     }
 
     /**
