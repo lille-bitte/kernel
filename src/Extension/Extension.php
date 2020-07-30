@@ -60,13 +60,6 @@ abstract class Extension implements ExtensionInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getAnnotationClasses()
-    {
-    }
-
-    /**
      * Automatically set class name from child class.
      *
      * @return void
